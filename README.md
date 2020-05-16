@@ -13,7 +13,7 @@ Management IP | Service IP | Service FQDN    | Role        | OS
 
 
 
-Management will be from to following workstation.
+Management and hosting from the following workstation.
 
 Management IP | Service IP | Service FQDN | Role | OS
 
