@@ -4,9 +4,13 @@ Windows Event Forwarding Lab
 This lab will walk throught building three Windows Server 2016 VMs build on Virtual Box.
 
 Managament IP | Service IP | Service FQDN    | Role        | OS
+
 192.168.1.111 | 10.0.0.111 | WINDC1.hq.corp  | WEF Lab DC  | Windows 2016
+
 192.168.1.112 | 10.0.0.112 | WINMS1.hq.corp  | WEF Lab MS  | Windows 2016
+
 192.168.1.113 | 10.0.0.113 | WINWEC1.hq.corp | WEF Lab WEC | Windows 2016
+
 
 Managament will be from to following workstation.
 Managament IP | Service IP | Service FQDN | Role | OS
