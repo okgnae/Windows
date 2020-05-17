@@ -56,4 +56,4 @@ $ComputerName = "WINMS1"
 
 ### Rename, Reboot
 Rename-Computer -NewName $ComputerName -Force
-Restart-Computer -Force
+Start-Process -FilePath C:\Windows\System32\Sysprep\sysprep.exe -ArgumentList "/generalize /reboot /audit"
