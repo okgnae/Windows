@@ -7,7 +7,7 @@ $ManagementInterfaceIndex = (Get-NetAdapter).ifIndex[0]
 ### Define Management Network
 $ManagementIPAddress = "192.168.1.111"
 $ManagementPrefixLength = "24"
-$ManagementServerAddresses = ""
+$ManagementDnsServerAddresses = ""
 
 ### Add IP, Netmask, Gateway, and DNS to Management NIC
 New-NetIPAddress `
@@ -17,7 +17,7 @@ New-NetIPAddress `
 
 Set-NetIPInterface -InterfaceIndex $ManagementInterfaceIndex -Dhcp Disabled
 
-Set-DNSClientServerAddress –interfaceIndex $ManagementInterfaceIndex –ServerAddresses $ManagementServerAddresses
+Set-DNSClientServerAddress –interfaceIndex $ManagementInterfaceIndex –ServerAddresses $ManagementDnsServerAddresses
 
 ### Get Service Network Adapter
 $ServiceInterfaceIndex = (Get-NetAdapter).ifIndex[1]
