@@ -26,7 +26,7 @@ $ServiceInterfaceIndex = (Get-NetAdapter).ifIndex[1]
 $ServiceIPAddress = "10.0.0.112"
 $ServicePrefixLength = "24"
 $ServiceDefaultGateway = "10.0.0.1"
-$ServiceServerAddresses = "10.0.0.10"
+$ServiceServerAddresses = "10.0.0.111"
 
 ### Add IP, Netmask, Gateway, and DNS to Service NIC
 New-NetIPAddress `
