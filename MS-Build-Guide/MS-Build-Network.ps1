@@ -2,7 +2,7 @@
 ### Administrator 12qw!@QW
 
 ### Get Management Network Adapter
-$ManagementInterfaceIndex = (Get-NetAdapter | Sort-Object -Property ifIndex).ifIndex[0]
+$ManagementInterfaceIndex = (Get-NetAdapter | Sort-Object -Property Name).ifIndex[0]
 # Remove-NetIPAddress -InterfaceIndex $ManagementInterfaceIndex
 
 ### Define Management Network
@@ -22,7 +22,7 @@ Set-NetIPInterface -InterfaceIndex $ManagementInterfaceIndex -Dhcp Disabled
 Set-DNSClientServerAddress –interfaceIndex $ManagementInterfaceIndex –ServerAddresses $ManagementServerAddresses
 
 ### Get Service Network Adapter
-$ServiceInterfaceIndex = (Get-NetAdapter | Sort-Object -Property ifIndex).ifIndex[1]
+$ServiceInterfaceIndex = (Get-NetAdapter | Sort-Object -Property Name).ifIndex[1]
 # Remove-NetIPAddress -InterfaceIndex $ServiceInterfaceIndex
 
 ### Define Service Network
