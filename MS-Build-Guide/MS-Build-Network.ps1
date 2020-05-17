@@ -2,12 +2,14 @@
 ### Administrator 12qw!@QW
 
 ### Get Management Network Adapter
-$ManagementInterfaceIndex = (Get-NetAdapter).ifIndex[0]
+$ManagementInterfaceIndex = (Get-NetAdapter | Sort-Object -Property ifIndex).ifIndex[0]
+# Remove-NetIPAddress -InterfaceIndex $ManagementInterfaceIndex
 
 ### Define Management Network
 $ManagementIPAddress = "192.168.1.112"
 $ManagementPrefixLength = "24"
 $ManagementServerAddresses = ""
+
 
 ### Add IP, Netmask, Gateway, and DNS to Management NIC
 New-NetIPAddress `
@@ -20,7 +22,8 @@ Set-NetIPInterface -InterfaceIndex $ManagementInterfaceIndex -Dhcp Disabled
 Set-DNSClientServerAddress –interfaceIndex $ManagementInterfaceIndex –ServerAddresses $ManagementServerAddresses
 
 ### Get Service Network Adapter
-$ServiceInterfaceIndex = (Get-NetAdapter).ifIndex[1]
+$ServiceInterfaceIndex = (Get-NetAdapter | Sort-Object -Property ifIndex).ifIndex[1]
+# Remove-NetIPAddress -InterfaceIndex $ServiceInterfaceIndex
 
 ### Define Service Network
 $ServiceIPAddress = "10.0.0.112"
