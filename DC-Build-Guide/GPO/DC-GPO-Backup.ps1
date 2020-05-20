@@ -3,6 +3,7 @@ $GpoBackupPath = "C:\Users\Administrator\Desktop\"
 $GpoBackupDir = "GpoBackup"
 $GpoBackupPathDir = $GpoBackupPath + $GpoBackupDir
 
+
 ### Create Back up Directory
 if (!(Test-Path $GpoBackupPathDir))
 {
@@ -20,3 +21,6 @@ $GpoInherits = @()
 $GpoInherits += (Get-ADDomain).DistinguishedName | Get-GPInheritance
 $GpoInherits += (Get-ADOrganizationalUnit -Filter * | Where-Object -Property LinkedGroupPolicyObjects -Like -Value cn=*).DistinguishedName | Get-GPInheritance
 $GpoInherits.GpoLinks | Export-Csv -NoTypeInformation -Path "$GpoBackupPathDir\GpoLinks.csv"
+
+### Zip up the GPO Backup
+Compress-Archive -Path $GpoBackupPathDir -DestinationPath ($GpoBackupPathDir + (Get-Date -UFormat "%Y%m%d") + ".zip") -CompressionLevel Fastest -Force
