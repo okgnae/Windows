@@ -15,18 +15,16 @@
 		</PushSettings>
 	</Delivery>
 	<Query>
-		<![CDATA[
-
-
-<QueryList>
-	<Query Id="0">
-		<Select Path="Setup">*</Select>
-        <Select Path="System">*</Select>
-	</Query>
-</QueryList>
-
-
-		]]>
+    <![CDATA[
+      
+      <QueryList>
+	      <Query Id="0">
+          <Select Path="Setup">*</Select>
+          <Select Path="System">*</Select>
+        </Query>
+      </QueryList>
+      
+     ]]>
 	</Query>
 	<ReadExistingEvents>false</ReadExistingEvents>
 	<TransportName>HTTP</TransportName>
