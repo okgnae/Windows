@@ -14,7 +14,14 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\C
 
 
 ### WinRM
-Start-Process -FilePath C:\Windows\System32\wecutil.exe -ArgumentList "quick-config /quiet:true"
+# winrm /?
+# winrm get /?
+# winrm get winrm/config
+# winrm enumerate /?
+# winrm enumerate winrm/config/Listener
+# winrm set /?
+# winrm set winrm/config/Listener?Address=*+Transport=HTTP '@{ListeningOn="10.0.0.113"}'
+Start-Process -FilePath C:\Windows\System32\winrm.cmd -ArgumentList "quickconfig"
 
 
 ### WECUTL
@@ -22,7 +29,7 @@ Start-Process -FilePath C:\Windows\System32\wecutil.exe -ArgumentList "quick-con
 # wecutil.exe enum-subscription
 # wecutil get-subscription WEF-Subscription-Baseline /f:xml > C:\users\Administrator.hq\Documents\WEF-Subscription-Baseline.xml
 # wecutil delete-subscription WEF-Subscription-Baseline
-
+Start-Process -FilePath C:\Windows\System32\wecutil.exe -ArgumentList "quick-config /quiet:true"
 Start-Process -FilePath C:\Windows\system32\wecutil.exe -ArgumentList "create-subscription C:\users\Administrator.hq\Documents\WEF-Subscription-Baseline.xml"
 
 
@@ -52,7 +59,6 @@ foreach ($Urlacl in $Urlacls)
 Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=http://+:47001/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
 Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=http://+:5985/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
 Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=https://+:5986/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
-
 
 ### Restart computer
 Restart-Computer -Force
