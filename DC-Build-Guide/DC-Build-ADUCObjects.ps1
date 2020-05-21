@@ -3,11 +3,12 @@
 
 ### Create OUs
 $Domain = "DC=hq,DC=corp"
+$ParentOU = "OU=HQ,"
 New-ADOrganizationalUnit -Name "HQ" -Path $Domain -Verbose
-New-ADOrganizationalUnit -Name "Users" -Path ("OU=HQ," + $Domain) -Verbose
-New-ADOrganizationalUnit -Name "Groups" -Path ("OU=HQ," + $Domain) -Verbose
-New-ADOrganizationalUnit -Name "Servers" -Path ("OU=HQ," + $Domain) -Verbose
-New-ADOrganizationalUnit -Name "Workstations" -Path ("OU=HQ," + $Domain) -Verbose
+New-ADOrganizationalUnit -Name "Users" -Path ($ParentOU + $Domain) -Verbose
+New-ADOrganizationalUnit -Name "Groups" -Path ($ParentOU + $Domain) -Verbose
+New-ADOrganizationalUnit -Name "Servers" -Path ($ParentOU + $Domain) -Verbose
+New-ADOrganizationalUnit -Name "Workstations" -Path ($ParentOU + $Domain) -Verbose
 
 
 ### Create WinMS1 Computer object
