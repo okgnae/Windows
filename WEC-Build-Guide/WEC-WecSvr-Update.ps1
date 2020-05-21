@@ -1,4 +1,4 @@
-### WEC-Update-WecSvr
+### WEC-WecSvr-Update
 
 # Currently written to only handle a single subscription
 
