@@ -8,7 +8,7 @@
 	<Delivery Mode="Push">
 		<Batching>
 			<MaxItems>50</MaxItems>
-			<MaxLatencyTime>30000</MaxLatencyTime>
+			<MaxLatencyTime>20000</MaxLatencyTime>
 		</Batching>
 		<PushSettings>
 			<Heartbeat Interval="300000"/>
