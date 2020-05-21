@@ -18,6 +18,7 @@ Else
     
     If ($SysmonNLExe -gt $SysmonLocalExe)
     {
+        Write-Host "Update Sysmon Installation"
         ### UnInstall Sysmon
         Start-Process -FilePath C:\Windows\Sysmon64.exe -ArgumentList "-u force"
         ### Install Sysmon
@@ -33,6 +34,7 @@ Else
     
         If ($SysmonNLConf -gt $SysmonLocalConf)
         {
+            Write-Host "Update Sysmon Config"
             ### Update Sysmon
             Copy-Item -Path \\hq.corp\NETLOGON\Sysmon\Sysmon-Config.xml -Destination C:\Users\Public  -Force -Verbose
             Start-Process -FilePath C:\Windows\Sysmon64.exe -ArgumentList "-c C:\Users\Public\Sysmon-Config.xml"
