@@ -1,4 +1,4 @@
-### WEC-WEF-Service
+### WEC-WecSvr-Config
 # https://docs.microsoft.com/en-us/windows/win32/wec/setting-up-a-source-initiated-subscription
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection#appendix-d---minimum-gpo-for-wef-client-configuration
 
