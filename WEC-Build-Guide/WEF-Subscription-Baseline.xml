@@ -18,172 +18,250 @@
 	<![CDATA[
 	
 <QueryList>
-  <Query Id="0" Path="System">
-    <!-- Anti-malware *old* events, but only detect events (cuts down noise) -->
-    <Select Path="System">*[System[Provider[@Name='Microsoft Antimalware'] and (EventID &gt;= 1116 and EventID &lt;= 1119)]]</Select>
-  </Query>
-  <!-- AppLocker EXE events or Script events -->
-  <Query Id="1" Path="Microsoft-Windows-AppLocker/EXE and DLL">
-    <Select Path="Microsoft-Windows-AppLocker/EXE and DLL">*[UserData[RuleAndFileData[PolicyName="EXE"]]]</Select>
-    <Select Path="Microsoft-Windows-AppLocker/MSI and Script">*</Select>
-  </Query>
-  <Query Id="2" Path="Security">
-    <!-- Wireless Lan 802.1x authentication events with Peer MAC address -->
-    <Select Path="Security">*[System[(EventID=5632)]]</Select>
-  </Query>
-  <Query Id="3" Path="Microsoft-Windows-TaskScheduler/Operational">
-    <!-- Task scheduler Task Registered (106),  Task Registration Deleted (141), Task Deleted (142) -->
-    <Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
-    <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
-  </Query>
-  <Query Id="4" Path="System">
-    <!-- System startup (12 - includes OS/SP/Version) and shutdown -->
-    <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and (EventID=12 or EventID=13)]]</Select>
-  </Query>
-  <Query Id="5" Path="System">
-    <!-- Service Install (7000), service start failure (7045), new service (4697) -->
-    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID = 7000 or EventID=7045)]]</Select>
-<Select Path="Security">*[System[(EventID=4697)]]</Select>
-  </Query>
-  <Query Id="6" Path="Security">
-    <!-- TS Session reconnect (4778), TS Session disconnect (4779) -->
-    <Select Path="Security">*[System[(EventID=4778 or EventID=4779)]]</Select>
-  </Query>
-  <Query Id="7" Path="Security">
-    <!-- Network share object access without IPC$ and Netlogon shares -->
-    <Select Path="Security">*[System[(EventID=5140)]] and (*[EventData[Data[@Name="ShareName"]!="\\*\IPC$"]]) and (*[EventData[Data[@Name="ShareName"]!="\\*\NetLogon"]])</Select>
-  </Query>
-  <Query Id="8" Path="Security">
-    <!-- System Time Change (4616)  -->
-    <Select Path="Security">*[System[(EventID=4616)]]</Select>
-  </Query>
-  <Query Id="9" Path="System">
-    <!-- Shutdown initiate requests, with user, process and reason (if supplied) -->
-    <Select Path="System">*[System[Provider[@Name='USER32'] and (EventID=1074)]]</Select>
-  </Query>
-  <!-- AppLocker packaged (Modern UI) app execution -->
-  <Query Id="10" Path="Microsoft-Windows-AppLocker/Packaged app-Execution">
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Execution">*</Select>
-  </Query>
-  <!-- AppLocker packaged (Modern UI) app installation -->
-  <Query Id="11" Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">
-    <Select Path="Microsoft-Windows-AppLocker/Packaged app-Deployment">*</Select>
-  </Query>
-  <Query Id="12" Path="Application">
-    <!-- EMET events -->
-    <Select Path="Application">*[System[Provider[@Name='EMET']]]</Select>
-  </Query>
-  <Query Id="13" Path="System">
-    <!-- Event log service events -->
-    <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
-  </Query>
-  <Query Id="14" Path="Security">
-    <!-- Local logons without network or service events -->
-    <Select Path="Security">*[System[(EventID=4624)]] and (*[EventData[Data[@Name="LogonType"]!="3"]]) and (*[EventData[Data[@Name="LogonType"]!="5"]])</Select>
-  </Query>
-  <Query Id="15" Path="Application">
-    <!-- WER events for application crashes only -->
-    <Select Path="Application">*[System[Provider[@Name='Windows Error Reporting']]] and (*[EventData[Data[3] ="APPCRASH"]])</Select>
-  </Query>
-  <Query Id="16" Path="Security">
-    <!-- Security Log cleared events (1102), EventLog Service shutdown (1100)-->
-    <Select Path="Security">*[System[(EventID=1102 or EventID = 1100)]]</Select>
-  </Query>
-  <Query Id="17" Path="System">
-    <!-- Other Log cleared events (104)-->
-    <Select Path="System">*[System[(EventID=104)]]</Select>
-  </Query>
-  <Query Id="18" Path="Security">
-    <!--  user initiated logoff -->
-    <Select Path="Security">*[System[(EventID=4647)]]</Select>
-  </Query>
-  <Query Id="19" Path="Security">
-    <!-- user logoff for all non-network logon sessions-->
-    <Select Path="Security">*[System[(EventID=4634)]] and (*[EventData[Data[@Name="LogonType"] != "3"]])</Select>
-  </Query>
-  <Query Id="20" Path="Security">
-    <!-- Service logon events if the user account isn't LocalSystem, NetworkService, LocalService -->
-    <Select Path="Security">*[System[(EventID=4624)]] and (*[EventData[Data[@Name="LogonType"]="5"]]) and (*[EventData[Data[@Name="TargetUserSid"] != "S-1-5-18"]]) and (*[EventData[Data[@Name="TargetUserSid"] != "S-1-5-19"]]) and (*[EventData[Data[@Name="TargetUserSid"] != "S-1-5-20"]])</Select>
-  </Query>
-  <Query Id="21" Path="Security">
-    <!-- Network Share create (5142), Network Share Delete (5144)  -->
-    <Select Path="Security">*[System[(EventID=5142 or EventID=5144)]]</Select>
-  </Query>
-  <Query Id="22" Path="Security">
-    <!-- Process Create (4688) -->
-    <Select Path="Security">*[System[EventID=4688]]</Select>
-  </Query>
-  <Query Id="23" Path="Security">
-    <!-- Event log service events specific to Security channel -->
-    <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
-  </Query>
-  <Query Id="26" Path="Security">
-    <!-- Special Privileges (Admin-equivalent Access) assigned to new logon, excluding LocalSystem-->
-    <Select Path="Security">*[System[(EventID=4672)]]</Select>
-    <Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress>
-  </Query>
-  <Query Id="27" Path="Security">
-    <!-- New user added to local security group-->
-    <Select Path="Security">*[System[(EventID=4732)]]</Select>
-  </Query>
-  <Query Id="28" Path="Security">
-    <!-- New user added to global security group-->
-    <Select Path="Security">*[System[(EventID=4728)]]</Select>
-  </Query>
-  <Query Id="29" Path="Security">
-    <!-- New user added to universal security group-->
-    <Select Path="Security">*[System[(EventID=4756)]]</Select>
-  </Query>
-  <Query Id="30" Path="Security">
-    <!-- User removed from local Administrators group-->
-    <Select Path="Security">*[System[(EventID=4733)]] and (*[EventData[Data[@Name="TargetUserName"]="Administrators"]])</Select>
-  </Query>
-  <Query Id="31" Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">
-    <!-- Log attempted TS connect to remote server -->
-    <Select Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">*[System[(EventID=1024)]]</Select>
-  </Query>
-  <Query Id="32" Path="Security">
-    <!-- Certificate Services received certificate request (4886), Approved and Certificate issued (4887), Denied request (4888) -->
-    <Select Path="Security">*[System[(EventID=4886 or EventID=4887 or EventID=4888)]]</Select>
-  </Query>
-  <Query Id="34" Path="Security">
-    <!-- New User Account Created(4720), User Account Enabled (4722), User Account Disabled (4725), User Account Deleted (4726) -->
-    <Select Path="Security">*[System[(EventID=4720 or EventID=4722 or EventID=4725 or EventID=4726)]]</Select>
-  </Query>
-  <Query Id="35" Path="Microsoft-Windows-SmartCard-Audit/Authentication">
-    <!-- Gets all Smart-card Card-Holder Verification (CHV) events (success and failure) performed on the host. -->
-    <Select Path="Microsoft-Windows-SmartCard-Audit/Authentication">*</Select>
-  </Query>
-  <Query Id="36" Path="Microsoft-Windows-SMBClient/Operational">
-    <!-- get all UNC/mapped drive successful connection -->
-    <Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(EventID=30622 or EventID=30624)]]</Select>
-  </Query>
-  <Query Id="37" Path="Application">
-    <!-- User logging on with Temporary profile (1511), cannot create profile, using temporary profile (1518)-->
-    <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-User Profiles Service'] and (EventID=1511 or EventID=1518)]]</Select>
-  </Query>
-  <Query Id="39" Path="Microsoft-Windows-Sysmon/Operational">
-    <!-- Modern SysMon event provider-->
-    <Select Path="Microsoft-Windows-Sysmon/Operational">*</Select>
-  </Query>
-  <Query Id="40" Path="Application">
-    <!-- Application crash/hang events, similar to WER/1001. These include full path to faulting EXE/Module.-->
-    <Select Path="Application">*[System[Provider[@Name='Application Error'] and (EventID=1000)]]</Select>
-    <Select Path="Application">*[System[Provider[@Name='Application Hang'] and (EventID=1002)]]</Select>
-  </Query>
-  <Query Id="41" Path="Microsoft-Windows-Windows Defender/Operational">
-    <!-- Modern Windows Defender event provider Detection events (1006-1009) and (1116-1119) -->
-    <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[( (EventID &gt;= 1006 and EventID &lt;= 1009) )]]</Select>
-    <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[( (EventID &gt;= 1116 and EventID &lt;= 1119) )]]</Select>
-  </Query>
-  <Query Id="42" Path="Security">
-    <!-- An account Failed to Log on events -->
-    <Select Path="Security">*[System[(EventID=4625)]] and (*[EventData[Data[@Name="LogonType"]!="2"]]) </Select>
-  </Query>
-  <Query Id="43" Path="Security">
-    <!-- All Sec Log for testing -->
-    <Select Path="Security">*</Select>
-  </Query>
+
+	<Query Id="1"> <!--"Security"-->
+		<Select Path="Security">*</Select> <!--"Collect all events from Security Log; Suppression statements to filter bellow"-->
+		<Suppress Path="Security">*[System[EventID='4624']] and *[EventData[Data[@Name='LogonType']='3']]</Suppress> <!--"An account was successfully logged on: Supressed Logon Type 3 (Network)"-->
+		<Suppress Path="Security">*[System[EventID='4627']]</Suppress> <!--"Group membership information"-->
+		<Suppress Path="Security">*[System[EventID='4634']]</Suppress> <!--"An account was logged off"-->
+		<Suppress Path="Security">*[System[EventID='4658']]</Suppress> <!--"The handle to an object was closed"-->
+		
+		<Suppress Path="Security">*[System[EventID='4656']] and *[EventData[Data[@Name='AccessMask']='0x100001']]</Suppress> <!--"A handle to an object was requested:  SYNCHRONIZE|ReadData (or ListDirectory)"-->
+		<Suppress Path="Security">*[System[EventID='4656']] and *[EventData[Data[@Name='AccessMask']='0x1410']]</Suppress> <!--"A handle to an object was requested: Read from process memory Query|process information|Undefined Access (no effect) Bit 12"-->
+		
+		<Suppress Path="Security">*[System[EventID='4662']] and *[EventData[Data[@Name='AccessMask']='0x1']]</Suppress> <!--"An operation was performed on an object:  Unknown specific access (bit 0)"-->
+		<Suppress Path="Security">*[System[EventID='4662']] and *[EventData[Data[@Name='AccessMask']='0x10']]</Suppress> <!--"An operation was performed on an object:  Read Property"-->
+		<Suppress Path="Security">*[System[EventID='4662']] and *[EventData[Data[@Name='AccessMask']='0x4']]</Suppress> <!--"An operation was performed on an object:  List Contents"-->
+		<Suppress Path="Security">*[System[EventID='4662']] and *[EventData[Data[@Name='AccessMask']='0x20000']]</Suppress> <!--"An operation was performed on an object:  READ_CONTROL"-->
+		<Suppress Path="Security">*[System[EventID='4662']] and *[EventData[Data[@Name='AccessMask']='0x1020000']]</Suppress> <!--"An operation was performed on an object:  READ_CONTROL|ACCESS_SYS_SEC"-->
+		<Suppress Path="Security">*[System[EventID='4663']] and *[EventData[Data[@Name='AccessMask']='0x10']]</Suppress> <!--"An attempt was made to access an object:  Read from process memory"-->
+		
+		<Suppress Path="Security">*[System[EventID='4670']]</Suppress> <!--"Permissions on an object were changed"-->
+		
+		<Suppress Path="Security">*[System[EventID='4672']] and *[EventData[Data[@Name='SubjectUserName']='nessus.scanner']]</Suppress> <!--"Special privileges assigned to new logon: Supressed based on SubjectUserName"-->
+		<Suppress Path="Security">*[System[EventID='4672']] and *[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']]</Suppress> <!--"An account was successfully logged on: Supressed based on SubjectUserSid S-1-5-18 SYSTEM Account"-->
+		
+		<Suppress Path="Security">*[System[EventID='4673']]</Suppress> <!--"A privileged service was called"-->
+
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='C:\WINDOWS\system32\wbem\wmiprvse.exe -Embedding']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='C:\WINDOWS\system32\wbem\wmiprvse.exe -secured -Embedding']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='C:\WINDOWS\sysWOW64\wbem\wmiprvse.exe -Embedding']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='C:\WINDOWS\sysWOW64\wbem\wmiprvse.exe -secured -Embedding']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='\??\C:\WINDOWS\system32\conhost.exe 0xffffffff -ForceV1']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='cmd "/c arp -a"']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='CommandLine']='netstat  -aon -p TCP']]</Suppress> <!--"A new process has been created.: Suppressed based on CLI"-->
+		
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='NewProcessName']='C:\Windows\system32\xcopy.exe']]</Suppress> <!--"A new process has been created.: Suppressed based on NewProcessName"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='NewProcessName']='C:\Windows\sysWOW64\xcopy.exe']]</Suppress> <!--"A new process has been created.: Suppressed based on NewProcessName"-->
+		
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='ParentProcessName']='C:\Windows\system32\xcopy.exe']]</Suppress> <!--"A new process has been created.: Suppressed based on ProcessName"-->
+		<Suppress Path="Security">*[System[EventID='4688']] and *[EventData[Data[@Name='ParentProcessName']='C:\Windows\sysWOW64\xcopy.exe']]</Suppress> <!--"A new process has been created.: Suppressed based on ProcessName"-->
+		
+		<Suppress Path="Security">*[System[EventID='4703']] and *[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']]</Suppress> <!--"A token right was adjusted: Supressed based on SubjectUserSid S-1-5-18 SYSTEM Account"-->
+
+		<Suppress Path="Security">*[System[EventID='4776']] and *[EventData[Data[@Name='TargetUserName']='nessus.scanner']]</Suppress> <!--"The computer attempted to validate the credentials for an account: Supressed based on TargetUserName"-->
+		<Suppress Path="Security">*[System[EventID='4776']] and *[EventData[Data[@Name='Status']='0x0']]</Suppress> <!--"The domain controller attempted to validate the credentials for an account: Status OK: only log failures"-->
+
+		<Suppress Path="Security">*[System[EventID='4689']]</Suppress> <!--"A process has exited"-->
+		<Suppress Path="Security">*[System[EventID='4690']]</Suppress> <!--"An attempt was made to duplicate a handle to an object"-->
+		<Suppress Path="Security">*[System[EventID='4798']]</Suppress> <!--A user's local group membership was enumerated"-->
+		<Suppress Path="Security">*[System[EventID='4799']]</Suppress> <!--A security-enabled local group membership was enumerated"-->
+		<Suppress Path="Security">*[System[EventID='4957']]</Suppress> <!--"Windows Firewall did not apply the following rule"-->
+		<Suppress Path="Security">*[System[EventID='5058']]</Suppress> <!--"Key file operation"-->
+		<Suppress Path="Security">*[System[EventID='5061']]</Suppress> <!--"Cryptographic operation"-->
+
+		<Suppress Path="Security">*[System[EventID='5140']] and *[EventData[Data[@Name='SubjectUserName']='nessus.scanner']]</Suppress>	<!--"File Share Access: Suppressed based on SubjectUserName"-->
+		<Suppress Path="Security">*[System[EventID='5140']] and *[EventData[Data[@Name="ShareName"]='\\*\IPC$']]</Suppress>	<!--"File Share Access: Suppressed based on ShareName: Filter out \\*\IPC$"-->
+		<Suppress Path="Security">*[System[EventID='5140']] and *[EventData[Data[@Name="ShareName"]='\\*\NETLOGON']]</Suppress>	<!--"File Share Access: Suppressed based on ShareName: Filter out \\*\IPC$"-->
+		<Suppress Path="Security">*[System[EventID='5140']] and *[EventData[Data[@Name="ShareName"]='\\*\SYSVOL']]</Suppress>	<!--"File Share Access: Suppressed based on ShareName: Filter out \\*\IPC$"-->
+
+		<Suppress Path="Security">*[System[EventID='5145']] and *[EventData[Data[@Name='SubjectUserName']='nessus.scanner']]</Suppress> <!--"Detailed File Share Access: Suppressed based on SubjectUserName"-->
+		<Suppress Path="Security">*[System[EventID='5145']] and *[EventData[Data[@Name="ShareName"]!='\\*\C$']]</Suppress>	<!--"Detailed File Share Access: Suppressed based on ShareName: Only record details for C$"-->
+
+		<Suppress Path="Security">*[System[EventID='5152']]</Suppress> <!--"The Windows Filtering Platform has blocked a packet"-->
+		<Suppress Path="Security">*[System[EventID='5156']]</Suppress> <!--"The Windows Filtering Platform has permitted a connection."-->
+		<Suppress Path="Security">*[System[EventID='5158']]</Suppress> <!--"The Windows Filtering Platform has permitted a bind to a local port."-->
+		<Suppress Path="Security">*[System[EventID='5379']]</Suppress> <!--"Credential Manager credentials were read"-->
+		<Suppress Path="Security">*[System[EventID='5381']]</Suppress> <!--"Vault credentials were read"-->
+		<Suppress Path="Security">*[System[EventID='5382']]</Suppress> <!--"Vault credentials were read"-->
+		<Suppress Path="Security">*[System[EventID='5447']]</Suppress> <!--"A Windows Filtering Platform filter has been changed"-->
+		<Suppress Path="Security">*[System[EventID='5633']]</Suppress> <!--"A request was made to authenticate to a wired network"-->
+		<Suppress Path="Security">*[System[EventID='6422']]</Suppress> <!--"A device was enabled"-->
+		<Suppress Path="Security">*[System[EventID='6420']]</Suppress> <!--"A device was disabled"-->
+		<Suppress Path="Security">*[System[EventID='6406']]</Suppress> <!--"Registered to Windows Firewall to control filtering for the following"-->
+		<Suppress Path="Security">*[System[EventID='6419']]</Suppress> <!--"A request was made to disable a device"-->
+		<Suppress Path="Security">*[System[EventID='6421']]</Suppress> <!--"A request was made to enable a device"-->
+		<Suppress Path="Security">*[System[EventID='6273']]</Suppress> <!--"Network Policy Server denied access to a user"-->
+		<Suppress Path="Security">*[System[EventID='6408']]</Suppress> <!--"Registered product %1 failed and Windows Firewall is now controlling the filtering for %2"-->
+		<Suppress Path="Security">*[System[EventID='6418']]</Suppress> <!--"The FIPS mode crypto selftests failed"-->
+		<Suppress Path="Security">*[System[EventID='6407']]</Suppress> <!--"We have not produced this event"-->
+		<Suppress Path="Security">*[System[EventID='6417']]</Suppress> <!--"The FIPS mode crypto selftests succeeded"-->
+		<Suppress Path="Security">*[System[EventID='33205']]</Suppress> <!--"SQL Audit"-->
+	</Query>
+
+	<Query Id="2"> <!--"Sysmon"-->
+		<Select Path="Microsoft-Windows-Sysmon/Operational">*</Select> <!--"Collect all events from Sysmon Log; Filtered by Sysmon configuration file"-->
+	</Query>
+
+	<Query Id="3"> <!--"Application: EMET"-->
+		<Select Path="Application">*[System[Provider[@Name='EMET'] and (
+			EventID='1' or <!--""-->
+			EventID='2')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="4"> <!--"Application: MsiInstaller"-->
+		<Select Path="Application">*[System[Provider[@Name='MsiInstaller'] and (
+			EventID='1022' or <!--""-->
+			EventID='1033')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="5"> <!--"Application: User Profiles Service"-->
+		<Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-User Profiles Service'] and (
+			EventID='1511' or <!--"Cannot create profile"-->
+			EventID='1518')]] <!--"Using temporary profile"-->
+		</Select>
+	</Query>
+
+	<Query Id="6"> <!--"Setup: Microsoft-Windows-Servicing"-->
+		<Select Path="Setup">*[System[Provider[@Name='Microsoft-Windows-Servicing'] and (
+			EventID='2' or <!--"Update Installed"-->
+			EventID='4')]] <!--"Update Pending Reboot"-->
+		</Select>
+	</Query>
+
+	<Query Id="7"> <!--"Application: Application Error"-->
+		<Select Path="Application">*[System[Provider[@Name='Application Error'] and (
+			EventID=1000)]] <!--"Application Error"-->
+		</Select>
+	</Query>
+
+	<Query Id="8">	<!--"Application: Application Hang"-->
+		<Select Path="Application">*[System[Provider[@Name='Application Hang'] and (
+			EventID=1002)]] <!--"Application Hang"-->
+		</Select>
+	</Query>
+
+	<Query Id="9"> <!--"Setup: Microsoft-Windows-WUSA"-->
+		<Select Path="Setup">*[System[Provider[@Name='Microsoft-Windows-WUSA'] and (
+			EventID='3')]] <!--"WUSA Update Error"-->
+		</Select>
+	</Query>
+
+	<Query Id="10"> <!--"System: Eventlog"-->
+		<Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Eventlog'] and (
+			EventID='104')]] <!--"Event Log was cleared"-->
+		</Select>
+	</Query>
+
+	<Query Id="11"> <!--"System: Service Control Manager"-->
+		<Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (
+			EventID='7000' or <!--"EVENT_SERVICE_INSTALLED"-->
+			EventID='7022' or <!--"EVENT_SERVICE_START_HUNG"-->
+			EventID='7023' or <!--"EVENT_SERVICE_EXIT_FAILED"-->
+			EventID='7024' or <!--"EVENT_SERVICE_EXIT_FAILED_SPECIFIC"-->
+			EventID='7026' or <!--"EVENT_BOOT_SYSTEM_DRIVERS_FAILED"-->
+			EventID='7031' or <!--"EVENT_SERVICE_CRASH"-->
+			EventID='7032' or <!--"EVENT_SERVICE_RECOVERY_FAILED"-->
+			EventID='7034' or <!--"EVENT_SERVICE_STOP_SUCCESS_WITH_REASON"-->
+			EventID='7043' or <!--"EVENT_SERVICE_SHUTDOWN_FAILED"-->
+			EventID='7045')]] <!--"EVENT_SERVICE_START_FAILED"-->
+		</Select>
+	</Query>
+
+	<Query Id="12"> <!--"System: GroupPolicy"-->
+		<Select Path="System">*[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and (
+			EventID='1125' or <!--"GPO Internal error"-->
+			EventID='1126' or <!--"GPO System Time Error"-->
+			EventID='1127' or <!--"GPO Generic Internal Error"-->
+			EventID='1129' or <!--"GPO Application failed due to Connectivity"-->
+			EventID='1130')]] <!--"GPO Logon script failed"-->
+		</Select>
+	</Query>
+
+	<Query Id="13"> <!--"System: WindowsUpdateClient"-->
+		<Select Path="System">*[System[Provider[@Name='Microsoft-Windows-WindowsUpdateClient'] and (
+			EventID='19' or <!--""-->
+			EventID='20' or <!--""-->
+			EventID='24' or <!--""-->
+			EventID='25' or <!--""-->
+			EventID='31' or <!--""-->
+			EventID='34' or <!--""-->
+			EventID='35')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="14"> <!--"System: Microsoft-Windows-Kernel-General"-->
+		<Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and (
+			EventID=12 or <!-- System startup -->
+			EventID=13)]] <!-- System shutdown -->
+		</Select>
+	</Query>
+
+	<Query Id="15"> <!--"System: USER32"-->
+		<Select Path="System">*[System[Provider[@Name='USER32'] and (
+			EventID=1074)]] <!--"Shutdown initiate requests with user"-->
+		</Select>
+	</Query>
+
+	<Query Id="16"> <!--"DFS Replication: DFSR"-->
+		<Select Path="DFS Replication">*[System[Provider[@Name='DFSR'] and (
+			EventID='5008' or <!--""-->
+			EventID='5002')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="17"> <!--"AppLocker EXE and DLL: Microsoft-Windows-AppLocker"-->
+		<Select Path="Microsoft-Windows-AppLocker/EXE and DLL">*[System[Provider[@Name='Microsoft-Windows-AppLocker'] and (
+			EventID='8003' or <!--""-->
+			EventID='8004')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="18"> <!--"AppLocker MSI and Script: Microsoft-Windows-AppLocker"-->
+		<Select Path="Microsoft-Windows-AppLocker/MSI and Script">*[System[Provider[@Name='Microsoft-Windows-AppLocker'] and (
+			EventID='8006' or <!--""-->
+			EventID='8007')]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="19"> <!--"PowerShell: Microsoft-Windows-PowerShell"-->
+		<Select Path="Microsoft-Windows-PowerShell/Operational">*[System[Provider[@Name='Microsoft-Windows-PowerShell'] and (
+			EventID='4104')]]  <!--"Powershell ScriptBlock"-->
+		</Select>
+		<Suppress Path="Microsoft-Windows-PowerShell/Operational">*[System[EventID='4104']] and *[System[Security[@UserID='S-1-5-18']]]</Suppress> <!--"Powershell ScriptBlock.: Suppressed SYSTEM Account (S-1-5-18)"-->
+	</Query>
+
+	<Query Id="20"> <!--"PrintService: Microsoft-Windows-PrintService"-->
+		<Select Path="Microsoft-Windows-PrintService/Operational">*[System[Provider[@Name='Microsoft-Windows-PrintService'] and (
+			EventID='307')]] <!--"Document Printed"-->
+		</Select>
+	</Query>
+
+	<Query Id="21"> <!--"WORK IN PROGRESS"-->
+		<Select Path="Microsoft-Windows-NTLM/Operational">*</Select>
+	</Query>
+
+	<Query Id="22"> <!--"TaskScheduler: Microsoft-Windows-TaskScheduler"-->
+		<Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (
+			EventID=106 or <!--"Task scheduler Task Registered"-->
+			EventID=141 or <!--"Task Registration Deleted"-->
+			EventID=142 )]] <!--"Task Deleted"-->
+		</Select>
+	</Query>
+
+	<Query Id="23"> <!--"SMBClient: Microsoft-Windows-SMBClient"-->
+	<Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(
+			EventID=30622 or <!--""-->
+			EventID=30624)]] <!--""-->
+		</Select>
+	</Query>
+
+	<Query Id="24"> <!--"SmartCard: Microsoft-Windows-SmartCard-Audit"-->
+		<Select Path="Microsoft-Windows-SmartCard-Audit/Authentication">*</Select>
+	</Query>
+
 </QueryList>
       	
 	]]>
