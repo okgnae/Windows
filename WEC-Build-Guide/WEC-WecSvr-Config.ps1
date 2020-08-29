@@ -24,7 +24,7 @@ Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\C
 # winrm enumerate winrm/config/Listener
 # winrm set /?
 # winrm set winrm/config/Listener?Address=*+Transport=HTTP '@{ListeningOn="10.0.0.113"}'
-Start-Process -FilePath 'C:\Windows\System32\winrm.cmd' -ArgumentList 'quickconfig'
+Start-Process -FilePath 'C:\Windows\System32\winrm.cmd' -ArgumentList 'quickconfig' -NoNewWindow -Wait
 
 
 ### NETSH
