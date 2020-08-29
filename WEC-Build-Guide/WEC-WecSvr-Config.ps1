@@ -2,16 +2,19 @@
 # https://docs.microsoft.com/en-us/windows/win32/wec/setting-up-a-source-initiated-subscription
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection
 
+
 ### Split WEC service to its own process
-Start-Process -FilePath 'C:\Windows\System32\sc.exe' -ArgumentList 'config wecsvc type=own'
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'Start' -Type 'DWord' -Value '2'
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DelayedAutostart' -Type 'DWord' -Value '1'
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DependOnService' -Type 'MultiString' -Value ('HTTP', 'Eventlog', 'WinRM')
+Start-Process -FilePath 'C:\Windows\System32\sc.exe' -ArgumentList 'config wecsvc type=own' -NoNewWindow -Wait
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'Start' -Type 'DWord' -Value '2' -Verbose
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DelayedAutostart' -Type 'DWord' -Value '1' -Verbose
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DependOnService' -Type 'MultiString' -Value ('HTTP', 'Eventlog', 'WinRM') -Verbose
 Restart-Service -Name 'Wecsvc' -Force
 
+
 ### Enable Forwarded Event Log Channel and set max size to 1GB
-Start-Process -FilePath 'C:\Windows\system32\wevtutil.exe' -ArgumentList "set-log ForwardedEvents /enabled:true"
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels\ForwardedEvents" -Name MaxSize -Value 1024000000 -Verbose -Force
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels\ForwardedEvents' -Name 'Enabled' -Value '1' -Verbose
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels\ForwardedEvents' -Name 'MaxSize' -Value '1024000000' -Verbose
+
 
 ### WinRM
 # winrm /?
@@ -22,6 +25,7 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\C
 # winrm set /?
 # winrm set winrm/config/Listener?Address=*+Transport=HTTP '@{ListeningOn="10.0.0.113"}'
 Start-Process -FilePath 'C:\Windows\System32\winrm.cmd' -ArgumentList 'quickconfig'
+
 
 ### NETSH
 # netsh.exe /?
