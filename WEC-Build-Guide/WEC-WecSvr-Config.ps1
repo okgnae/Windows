@@ -3,7 +3,7 @@
 # https://docs.microsoft.com/en-us/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection
 
 
-### Split WEC service to its own process
+### Split WEC service to its own process; set service dependencies and startup type auto delayed
 Start-Process -FilePath 'C:\Windows\System32\sc.exe' -ArgumentList 'config wecsvc type=own' -NoNewWindow -Wait
 Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'Start' -Type 'DWord' -Value '2' -Verbose
 Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DelayedAutostart' -Type 'DWord' -Value '1' -Verbose
