@@ -1,17 +1,17 @@
 ### WEC-WecSvr-Config
 # https://docs.microsoft.com/en-us/windows/win32/wec/setting-up-a-source-initiated-subscription
-# https://docs.microsoft.com/en-us/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection#appendix-d---minimum-gpo-for-wef-client-configuration
+# https://docs.microsoft.com/en-us/windows/security/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection
 
 ### Split WEC service to its own process
-Start-Process -FilePath C:\Windows\System32\sc.exe -ArgumentList "config wecsvc type=own"
-Set-Service wecsvc -StartupType Automatic
-Restart-Service -Name Wecsvc -Force
+Start-Process -FilePath 'C:\Windows\System32\sc.exe' -ArgumentList 'config wecsvc type=own'
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'Start' -Type 'DWord' -Value '2'
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DelayedAutostart' -Type 'DWord' -Value '1'
+Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Wecsvc' -Name 'DependOnService' -Type 'MultiString' -Value ('HTTP', 'Eventlog', 'WinRM')
+Restart-Service -Name 'Wecsvc' -Force
 
-
-### Forwarded Event Log Config
-Start-Process -FilePath C:\Windows\system32\wevtutil.exe -ArgumentList "set-log ForwardedEvents /enabled:true"
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels\ForwardedEvents" -Name MaxSize -Value 1052704768 -Verbose -Force
-
+### Enable Forwarded Event Log Channel and set max size to 1GB
+Start-Process -FilePath 'C:\Windows\system32\wevtutil.exe' -ArgumentList "set-log ForwardedEvents /enabled:true"
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Channels\ForwardedEvents" -Name MaxSize -Value 1024000000 -Verbose -Force
 
 ### WinRM
 # winrm /?
@@ -21,44 +21,63 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\C
 # winrm enumerate winrm/config/Listener
 # winrm set /?
 # winrm set winrm/config/Listener?Address=*+Transport=HTTP '@{ListeningOn="10.0.0.113"}'
-Start-Process -FilePath C:\Windows\System32\winrm.cmd -ArgumentList "quickconfig"
+Start-Process -FilePath 'C:\Windows\System32\winrm.cmd' -ArgumentList 'quickconfig'
 
+### NETSH
+# netsh.exe /?
+# netsh.exe http /?
+# netsh.exe http delete urlacl /?
+# netsh.exe http add urlacl /?
+# netsh.exe http show urlacl
+### Create Netsh.exe Process Start Info
+$NetSHProcStartInfo = New-Object System.Diagnostics.ProcessStartInfo -Property @{
+    FileName = 'C:\Windows\system32\netsh.exe'
+    RedirectStandardError = $true
+    RedirectStandardOutput = $true
+    UseShellExecute = $false
+    Arguments = 'http show urlacl'
+}
 
+### Create Netsh.exe Process with Start Info
+$NetShProc = New-Object System.Diagnostics.Process -Property @{
+    StartInfo = $NetSHProcStartInfo
+}
+
+### Start the NetSH Process
+$NetShProc.Start() | Out-Null
+$NetShProc.WaitForExit()
+### Capture NetSH Process StdOut
+$NetShProcStdOut = $NetShProc.StandardOutput.ReadToEnd()
+### Dispose of the NetSH process
+$NetShProc.Dispose()
+
+### Get URL strings for ws-man 
+$Urlacls = ($NetShProcStdOut.Split('\r') | Select-String -Pattern "http.*").Matches.Value.TrimEnd()
+### Get SDDL string for ws-man
+$SDDL_OLD = (($NetShProcStdOut.Split('\r') | Select-String -Pattern 'SDDL: (.*)').Matches.Value[0].Replace('SDDL: ','')).TrimEnd()
+### Add A;;GX;;;S-1-5-20 NETWORK SERVICE Account SID to SDDL
+$SDDL_NEW = $SDDL_OLD + '(A;;GX;;;S-1-5-20)'
+
+### Remove URL ACLs
+foreach ($Urlacl in $Urlacls)
+{
+    Start-Process -FilePath 'C:\Windows\system32\netsh.exe' -ArgumentList ('http delete urlacl url=' + $Urlacl) -Wait -NoNewWindow
+}
+
+### Create New URL ACLs
+foreach ($Urlacl in $Urlacls)
+{
+    Start-Process -FilePath 'C:\Windows\system32\netsh.exe' -ArgumentList ('http add urlacl url=' + $Urlacl + ' sddl=' + $SDDL_NEW) -Wait -NoNewWindow
+}
+
+### Restart computer
+Restart-Computer -Force
+
+### After the Restart Create the WEF subscriptions
 ### WECUTL
 # wecutil.exe /?
 # wecutil.exe enum-subscription
 # wecutil get-subscription WEF-Subscription-Baseline /f:xml > C:\users\Administrator.hq\Documents\WEF-Subscription-Baseline.xml
 # wecutil delete-subscription WEF-Subscription-Baseline
-Start-Process -FilePath C:\Windows\System32\wecutil.exe -ArgumentList "quick-config /quiet:true"
-Start-Process -FilePath C:\Windows\system32\wecutil.exe -ArgumentList "create-subscription C:\users\Administrator.hq\Documents\WEF-Subscription-Baseline.xml"
-
-
-### Restart computer
-Restart-Computer -Force
-
-
-### NETSH
-# netsh.exe /?
-# netsh.exe http /?
-# netsh.exe http add urlacl /?
-# netsh.exe http show urlacl
-
-
-### Remove all URL ACLs
-$NetSh = "C:\Windows\system32\netsh.exe"
-
-$Urlacls = netsh.exe http show urlacl | Select-String -Pattern "http.*"
-foreach ($Urlacl in $Urlacls)
-{
-    $ArgListUrlacl = "http delete urlacl url=" + $Urlacl.Matches.Value
-    Start-Process -FilePath $NetSh -ArgumentList $ArgListUrlacl
-}
-
-
-### Create New URL ACLs
-Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=http://+:47001/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
-Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=http://+:5985/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
-Start-Process -FilePath $NetSh -ArgumentList 'http add urlacl url=https://+:5986/wsman/ sddl="D:(A;;GX;;;S-1-5-80-569256582-2953403351-2909559716-1301513147-412116970)(A;;GX;;;S-1-5-80-4059739203-877974739-1245631912-527174227-2996563517)(A;;GX;;;S-1-5-20)"'
-
-### Restart computer
-Restart-Computer -Force
+Start-Process -FilePath 'C:\Windows\System32\wecutil.exe' -ArgumentList 'quick-config /quiet:true'
+Start-Process -FilePath 'C:\Windows\system32\wecutil.exe' -ArgumentList 'create-subscription C:\users\Administrator.hq\Documents\WEF-Subscription-Baseline.xml'
