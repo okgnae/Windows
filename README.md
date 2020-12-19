@@ -1,4 +1,4 @@
-**Project for documenting how to build a Domain based WEF enviorment using PowerShell:**  
+**Project for documenting how to build a Domain based WEF environment using PowerShell:**  
   
 &nbsp;&nbsp;1.) Build a Windows Domain  
 &nbsp;&nbsp;2.) Join Member Servers to the environment  
