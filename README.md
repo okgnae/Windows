@@ -1,4 +1,4 @@
-**Project was set up to document how to complete the following for test enviorment using PowerShell:**  
+**Project for documenting how to complete the following for test enviorments using PowerShell:**  
   
 &nbsp;&nbsp;1.) Build a Windows Domain  
 &nbsp;&nbsp;2.) Join Member Servers to the environment  
